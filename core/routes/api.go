@@ -8,7 +8,7 @@ import (
 func HandleRequests() {
 	r := gin.Default()
 
-	clients := r.Group("/api/")
+	base := r.Group("/api/")
 	{
 		clientsGroup := base.Group("clients")
 		{
