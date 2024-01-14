@@ -8,9 +8,10 @@ import (
 func HandleRequests() {
 	r := gin.Default()
 
-	base := r.Group("/api/")
+	clients := r.Group("/api/")
 	{
-		base.GET("clients/", clientscontroller.List)
+		clients.GET("clients/", clientscontroller.List)
+		clients.GET("clients/", clientscontroller.List)
 	}
 
 	r.Run(":8888")
