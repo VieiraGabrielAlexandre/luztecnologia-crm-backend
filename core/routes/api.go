@@ -10,8 +10,11 @@ func HandleRequests() {
 
 	clients := r.Group("/api/")
 	{
-		clients.GET("clients/", clientscontroller.List)
-		clients.GET("clients/", clientscontroller.List)
+		clientsGroup := base.Group("clients")
+		{
+			clientsGroup.GET("/", clientscontroller.List)
+			clientsGroup.GET("/:id", clientscontroller.Detail)
+		}
 	}
 
 	r.Run(":8888")
