@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -32,9 +33,12 @@ func ConnectDatabase() {
 		log.Panic(err)
 	}
 
-	// Create from map
-
 	fmt.Println("Executing migrations ...")
+
+	db.AutoMigrate(&models.Client{})
+
+	fmt.Println("Migrations executed successfully")
+
 	fmt.Println("Sucess")
 
 	DB = db
