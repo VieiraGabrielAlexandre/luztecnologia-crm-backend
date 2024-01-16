@@ -18,6 +18,7 @@ func HandleRequests() {
 			clientsGroup.POST("/", clientscontroller.Create)
 		}
 		base.POST("calculate", valuescontroller.Calculate)
+		base.GET("address/viacep/:postcode", addresscontroller.GetViaCepPostCode)
 
 	}
 
