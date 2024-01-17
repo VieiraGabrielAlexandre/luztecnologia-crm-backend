@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"time"
-
 	addresscontroller "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/controllers/address_controller"
 	clientscontroller "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/controllers/clients_controller"
 	valuescontroller "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/controllers/values_controller"
@@ -12,25 +10,32 @@ import (
 
 func HandleRequests() {
 	r := gin.Default()
+
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
-	config.ExposeHeaders = []string{"Content-Length"}
-	config.AllowCredentials = true
-	config.MaxAge = 12 * time.Hour
+	config.AllowOrigins = []string{"*"} // Update this with your actual allowed origins
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"*"} // Allow any headers for simplicity; you can customize this based on your needs
 
 	r.Use(cors.New(config))
+
+	r.OPTIONS("/api/clients", func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "*")
+		c.Status(200)
+	})
+
 	base := r.Group("/api/")
 	{
-		clientsGroup := base.Group("clients")
+		clients := base.Group("/clients")
 		{
-			clientsGroup.GET("/", clientscontroller.List)
-			clientsGroup.GET("/:id", clientscontroller.Detail)
-			clientsGroup.POST("/", clientscontroller.Create)
+			clients.GET("", clientscontroller.List)
+			clients.GET("/:id", clientscontroller.Detail)
+			clients.POST("", clientscontroller.Create)
 		}
-		base.POST("calculate", valuescontroller.Calculate)
-		base.GET("address/viacep/:postalcode", addresscontroller.GetViaCepPostalCode)
+
+		base.GET("/address/:postalcode", addresscontroller.GetViaCepPostalCode)
+		base.GET("/values", valuescontroller.Calculate)
 	}
 
 	r.Run(":3001")
