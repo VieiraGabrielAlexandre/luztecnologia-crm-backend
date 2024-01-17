@@ -2,38 +2,39 @@ package httprequests
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
+
+	"github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/models"
 )
 
-type Address struct {
-	Cep        string `json:"cep"`
-	Logradouro string `json:"logradouro"`
-	Bairro     string `json:"bairro"`
-	Localidade string `json:"localidade"`
-	UF         string `json:"uf"`
-}
+func GetViaPostalCode(postalCode string) (models.Address, error) {
+	baseApi := os.Getenv("VIA_CEP_URL")
+	apiUrl := fmt.Sprintf(baseApi, postalCode)
 
-func GetViaPostalCode(string postalCode) {
-	apiUrl := fmt.Sprintf(os.GetEnv("VIA_CEP_URL") . postalCode)	
-
-	response, err := http.Get(apiURL)
+	response, err := http.Get(apiUrl)
 	if err != nil {
 		fmt.Println("Error making HTTP request:", err)
-		return
+		return models.Address{}, err
 	}
 	defer response.Body.Close()
 
-	var address Address
+	if response.StatusCode != http.StatusOK {
+		return models.Address{}, errors.New("Postal code not found")
+	}
+
+	var address models.Address
 	err = json.NewDecoder(response.Body).Decode(&address)
 	if err != nil {
 		fmt.Println("Error decoding JSON response:", err)
-		return
+		return address, err
 	}
 
-	fmt.Printf("CEP: %s\n", address.Cep)
-	fmt.Printf("Logradouro: %s\n", address.Logradouro)
-	fmt.Printf("Bairro: %s\n", address.Bairro)
-	fmt.Printf("Localidade: %s\n", address.Localidade)
-	fmt.Printf("UF: %s\n", address.UF)
+	if address.Logradouro == "" && address.Localidade == "" && address.Cep == "" {
+		return models.Address{}, errors.New("Address is entirely null")
+	}
+
+	return address, err
 }

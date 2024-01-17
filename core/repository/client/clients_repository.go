@@ -9,7 +9,13 @@ import (
 )
 
 func Save(client *models.Client) {
-	config.DB.Create(client)
+	if err := config.DB.Model(&client).Where("cnpj = ?", client.Cnpj).Updates(client).Error; err != nil {
+		// always handle error like this, cause errors maybe happened when connection failed or something.
+		// record not found...
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			config.DB.Create(&client) // create new record from newUser
+		}
+	}
 }
 
 func GetAll() []models.Client {

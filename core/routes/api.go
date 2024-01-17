@@ -1,6 +1,7 @@
 package routes
 
 import (
+	addresscontroller "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/controllers/address_controller"
 	clientscontroller "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/controllers/clients_controller"
 	valuescontroller "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/controllers/values_controller"
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,7 @@ func HandleRequests() {
 			clientsGroup.POST("/", clientscontroller.Create)
 		}
 		base.POST("calculate", valuescontroller.Calculate)
-		base.GET("address/viacep/:postcode", addresscontroller.GetViaCepPostCode)
+		base.GET("address/viacep/:postalcode", addresscontroller.GetViaCepPostalCode)
 
 	}
 
