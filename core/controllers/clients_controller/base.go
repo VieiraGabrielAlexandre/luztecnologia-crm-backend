@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/models"
 	clientsrepository "github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/repository/client"
 	"github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/utils"
-	"github.com/gin-gonic/gin"
 )
 
 func List(ctx *gin.Context) {
@@ -57,6 +58,14 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
-	clientsrepository.Save(&clientModel)
-	ctx.JSON(http.StatusCreated, gin.H{"message": "Cliente criado com sucesso"})
+	message, erro := clientsrepository.Save(&clientModel)
+
+	if erro != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": erro.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, gin.H{"message": message})
 }

@@ -2,20 +2,30 @@ package clientsrepository
 
 import (
 	"errors"
+	"fmt"
+
+	"gorm.io/gorm"
 
 	"github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/config"
 	"github.com/VieiraGabrielAlexandre/luztecnologia-cms-backend/core/models"
-	"gorm.io/gorm"
 )
 
-func Save(client *models.Client) {
-	if err := config.DB.Model(&client).Where("cnpj = ?", client.Cnpj).Updates(client).Error; err != nil {
-		// always handle error like this, cause errors maybe happened when connection failed or something.
-		// record not found...
+func Save(client *models.Client) (string, error) {
+	var existingClient models.Client
+	if err := config.DB.Where("id = ? OR cnpj = ?", client.ID, client.Cnpj).First(&existingClient).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			config.DB.Create(&client) // create new record from newUser
+			config.DB.Create(&client)
+			return "Client created", nil
+
+		} else {
+			fmt.Println("Error:", err)
+			return "", err
 		}
+	} else {
+		config.DB.Model(&existingClient).Updates(client)
+		return "Client updated", nil
 	}
+
 }
 
 func GetAll() []models.Client {
